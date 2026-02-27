@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --background: #f4f6ff;
+  --card: #ffffff;
+  --surface: #f6f8ff;
+  --text: #1e2b55;
+  --muted: #5c6b8a;
+  --dark: #16213f;
+  --light: #fefefe;
+  --accent: #2b63ff;
+  --accent-soft: rgba(43, 99, 255, 0.2);
+
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(43, 99, 255, 0.16), transparent 45%),
+    radial-gradient(circle at 20% 20%, rgba(115, 156, 255, 0.14), transparent 40%),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.7), rgba(244, 246, 255, 0.95));
+  z-index: -1;
+  pointer-events: none;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+#root {
+  min-height: 100vh;
+}
