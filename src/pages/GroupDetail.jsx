@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 function GroupDetail() {
   const { id } = useParams()
@@ -9,6 +11,12 @@ function GroupDetail() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
+    if (esDemo()) {
+      const encontrado = datosDemo.grupos.find((item) => item.id === id)
+      setGrupo(encontrado || null)
+      setCargando(false)
+      return
+    }
     let activo = true
     apiFetch(`/groups/${id}`)
       .then((info) => {
@@ -26,6 +34,10 @@ function GroupDetail() {
   }, [id])
 
   const generarLink = async () => {
+    if (esDemo()) {
+      setLinkInvitacion('https://upagenda.demo/invite/TP-Sistemas')
+      return
+    }
     try {
       const info = await apiFetch(`/groups/${id}/invite-link`, { method: 'POST' })
       const link = info.link || info.inviteLink || info.url

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom'
 import { traerUsuario, borrarSesion } from '../utils/localAuth.js'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 function DashboardLayout() {
   const navegar = useNavigate()
@@ -9,6 +11,19 @@ function DashboardLayout() {
   const claseLink = ({ isActive }) => (isActive ? 'active' : '')
   const [pendientesNoti, setPendientesNoti] = useState(0)
   const [menuMobile, setMenuMobile] = useState(false)
+
+  const contarNotis = (info) => {
+    if (!info) return 0
+    if (typeof info.totalCount === 'number') return info.totalCount
+    if (typeof info.total === 'number') return info.total
+    if (typeof info.totalItems === 'number') return info.totalItems
+    if (typeof info.unreadCount === 'number') return info.unreadCount
+    if (typeof info.pendingCount === 'number') return info.pendingCount
+    if (typeof info.count === 'number') return info.count
+    if (Array.isArray(info)) return info.length
+    const lista = info.notifications || info.items || info.data || []
+    return Array.isArray(lista) ? lista.length : 0
+  }
 
   const salir = () => {
     borrarSesion()
@@ -20,14 +35,25 @@ function DashboardLayout() {
   }
 
   useEffect(() => {
+    if (esDemo()) {
+      setPendientesNoti(contarNotis(datosDemo.notificaciones))
+      return
+    }
     apiFetch('/notifications')
       .then((info) => {
-        const listaNotis = Array.isArray(info)
-          ? info
-          : info.notifications || info.items || info.data || []
-        setPendientesNoti(listaNotis.filter((noti) => !noti.read).length)
+        setPendientesNoti(contarNotis(info))
       })
       .catch(() => setPendientesNoti(0))
+  }, [])
+
+  useEffect(() => {
+    const manejar = (event) => {
+      if (typeof event.detail === 'number') {
+        setPendientesNoti(event.detail)
+      }
+    }
+    window.addEventListener('noti-count', manejar)
+    return () => window.removeEventListener('noti-count', manejar)
   }, [])
 
   useEffect(() => {
@@ -102,22 +128,39 @@ function DashboardLayout() {
       <div className="dashboard-main">
         <header className="topbar">
           <div className="topbar-left">
-            <button
-              className="menu-btn"
-              type="button"
-              aria-label="Abrir menu"
-              onClick={() => setMenuMobile(true)}
-            >
-              <span />
-              <span />
-              <span />
-            </button>
+            <img className="topbar-logo" src="/logo.png" alt="Up Agenda" />
             <div>
               <p className="topbar-title">Hola, {usuario?.name || 'Usuario'}</p>
               <p className="topbar-subtitle">Tu semana, bien organizada</p>
             </div>
           </div>
           <div className="topbar-actions">
+            <button
+              className="menu-btn"
+              type="button"
+              aria-label="Abrir menu"
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                setMenuMobile(true)
+              }}
+            >
+              <svg
+                className="menu-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M5 7h14M5 12h14M5 17h14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
             <Link className="notif-btn" to="/notificaciones" aria-label="Notificaciones">
               <svg
                 className="notif-icon"
@@ -150,8 +193,9 @@ function DashboardLayout() {
               <span>Buscar</span>
               <input type="search" placeholder="Eventos o categorias..." />
             </label>
-            <Link className="primary-btn small" to="/eventos/nuevo">
-              Nuevo evento
+            <Link className="primary-btn small new-event-btn" to="/eventos/nuevo">
+              <span className="new-event-icon">+</span>
+              <span className="new-event-text">Nuevo evento</span>
             </Link>
           </div>
         </header>

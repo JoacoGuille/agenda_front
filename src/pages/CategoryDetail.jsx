@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 function CategoryDetail() {
   const { id } = useParams()
@@ -8,6 +10,12 @@ function CategoryDetail() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
+    if (esDemo()) {
+      const encontrada = datosDemo.categorias.find((item) => item.id === id)
+      setCategoria(encontrada || null)
+      setCargando(false)
+      return
+    }
     let activo = true
     apiFetch(`/categories/${id}`)
       .then((info) => {
@@ -56,7 +64,15 @@ function CategoryDetail() {
     )
   }
 
-  const eventosRelacionados = categoria.events || []
+  const eventosRelacionados =
+    categoria.events ||
+    (esDemo()
+      ? datosDemo.eventos.filter((evento) => {
+          const catId = evento.category?.id || evento.categoryId
+          if (catId) return catId === categoria.id
+          return evento.category === categoria.name
+        })
+      : [])
 
   return (
     <section className="page">

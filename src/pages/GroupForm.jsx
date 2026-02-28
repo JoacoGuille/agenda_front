@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 function GroupForm() {
   const { id } = useParams()
@@ -18,6 +20,18 @@ function GroupForm() {
 
   useEffect(() => {
     if (!esEdicion) return
+    if (esDemo()) {
+      const grupo = datosDemo.grupos.find((item) => item.id === id)
+      if (!grupo) {
+        setMensajeError('No se pudo cargar el grupo.')
+        return
+      }
+      setFormulario({
+        name: grupo.name || '',
+        description: grupo.description || '',
+      })
+      return
+    }
     apiFetch(`/groups/${id}`)
       .then((info) => {
         const grupo = info.data || info
@@ -38,6 +52,14 @@ function GroupForm() {
     eventoForm.preventDefault()
     setMensajeError('')
     setCargando(true)
+
+    if (esDemo()) {
+      setTimeout(() => {
+        setCargando(false)
+        irA(volverA)
+      }, 400)
+      return
+    }
 
     try {
       if (esEdicion) {
@@ -62,6 +84,10 @@ function GroupForm() {
   const borrarGrupo = async () => {
     const confirmado = window.confirm('Eliminar este grupo?')
     if (!confirmado) return
+    if (esDemo()) {
+      irA(volverA)
+      return
+    }
     setCargando(true)
     try {
       await apiFetch(`/groups/${id}`, { method: 'DELETE' })

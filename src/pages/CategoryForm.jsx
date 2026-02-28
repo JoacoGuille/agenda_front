@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 function CategoryForm() {
   const { id } = useParams()
@@ -18,6 +20,18 @@ function CategoryForm() {
 
   useEffect(() => {
     if (!esEdicion) return
+    if (esDemo()) {
+      const categoria = datosDemo.categorias.find((item) => item.id === id)
+      if (!categoria) {
+        setMensajeError('No se pudo cargar la categoria.')
+        return
+      }
+      setFormulario({
+        name: categoria.name || '',
+        description: categoria.description || '',
+      })
+      return
+    }
     apiFetch(`/categories/${id}`)
       .then((info) => {
         const categoria = info.data || info
@@ -38,6 +52,14 @@ function CategoryForm() {
     eventoForm.preventDefault()
     setMensajeError('')
     setCargando(true)
+
+    if (esDemo()) {
+      setTimeout(() => {
+        setCargando(false)
+        irA(volverA)
+      }, 400)
+      return
+    }
 
     try {
       if (esEdicion) {
@@ -62,6 +84,10 @@ function CategoryForm() {
   const borrarCategoria = async () => {
     const confirmado = window.confirm('Eliminar esta categoria?')
     if (!confirmado) return
+    if (esDemo()) {
+      irA(volverA)
+      return
+    }
     setCargando(true)
     try {
       await apiFetch(`/categories/${id}`, { method: 'DELETE' })

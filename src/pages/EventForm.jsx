@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 function EventForm() {
   const { id } = useParams()
@@ -23,6 +25,10 @@ function EventForm() {
   })
 
   useEffect(() => {
+    if (esDemo()) {
+      setCategorias(datosDemo.categorias)
+      return
+    }
     apiFetch('/categories')
       .then((info) => {
         const lista = Array.isArray(info) ? info : info.categories || info.items || info.data || []
@@ -33,6 +39,33 @@ function EventForm() {
 
   useEffect(() => {
     if (!esEdicion) return
+    if (esDemo()) {
+      const evento = datosDemo.eventos.find((item) => item.id === id)
+      if (!evento) {
+        setMensajeError('No se pudo cargar el evento.')
+        return
+      }
+      const inicio = evento.startAt || evento.start
+      let fecha = evento.date || ''
+      let hora = evento.time || ''
+      if (inicio) {
+        const parsed = new Date(inicio)
+        if (!Number.isNaN(parsed.getTime())) {
+          fecha = parsed.toISOString().slice(0, 10)
+          hora = parsed.toTimeString().slice(0, 5)
+        }
+      }
+      setFormulario({
+        title: evento.title || evento.name || '',
+        date: fecha,
+        time: hora,
+        categoryId: evento.categoryId || evento.category?.id || '',
+        location: evento.location || '',
+        status: evento.status || 'programado',
+        description: evento.description || '',
+      })
+      return
+    }
     apiFetch(`/events/${id}`)
       .then((info) => {
         const evento = info.data || info
@@ -68,6 +101,14 @@ function EventForm() {
     eventoForm.preventDefault()
     setMensajeError('')
     setCargando(true)
+
+    if (esDemo()) {
+      setTimeout(() => {
+        setCargando(false)
+        irA(volverA)
+      }, 400)
+      return
+    }
 
     const inicio =
       formulario.date && formulario.time
@@ -106,6 +147,10 @@ function EventForm() {
   const borrarEvento = async () => {
     const confirmado = window.confirm('Eliminar este evento?')
     if (!confirmado) return
+    if (esDemo()) {
+      irA(volverA)
+      return
+    }
     setCargando(true)
     try {
       await apiFetch(`/events/${id}`, { method: 'DELETE' })

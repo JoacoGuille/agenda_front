@@ -1,0 +1,113 @@
+{
+  "info": {
+    "name": "Up Agenda - Frontend (API)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://TU-BACKEND.onrender.com"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Usuario Demo\",\n  \"email\": \"demo@agenda.com\",\n  \"password\": \"12345678\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"demo@agenda.com\",\n  \"password\": \"12345678\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Dashboard - Summary",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/dashboard/summary",
+          "host": ["{{baseUrl}}"],
+          "path": ["dashboard", "summary"]
+        }
+      }
+    },
+    {
+      "name": "Events - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/events",
+          "host": ["{{baseUrl}}"],
+          "path": ["events"]
+        }
+      }
+    },
+    {
+      "name": "Events - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/events",
+          "host": ["{{baseUrl}}"],
+          "path": ["events"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Clase React\",\n  \"startAt\": \"2026-03-02T09:30:00\",\n  \"categoryId\": \"cat-1\",\n  \"location\": \"Aula 3\",\n  \"description\": \"Hooks y router\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Categories - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/categories",
+          "host": ["{{baseUrl}}"],
+          "path": ["categories"]
+        }
+      }
+    },
+    {
+      "name": "Notifications - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/notifications",
+          "host": ["{{baseUrl}}"],
+          "path": ["notifications"]
+        }
+      }
+    }
+  ]
+}

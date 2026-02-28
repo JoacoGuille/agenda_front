@@ -4,8 +4,14 @@ import CalendarPreview from './CalendarPreview.jsx'
 function Hero() {
   const irA = useNavigate()
 
-  const irLogin = () => {
-    irA('/login')
+  const irDemo = () => {
+    const usuarioDemo = {
+      name: 'Usuario Demo',
+      email: 'demo@agenda.com',
+    }
+    localStorage.setItem('token', 'demo-token')
+    localStorage.setItem('user', JSON.stringify(usuarioDemo))
+    irA('/dashboard')
   }
 
   return (
@@ -18,8 +24,8 @@ function Hero() {
           entregas, reuniones y recordatorios con vista semanal clara.
         </p>
         <div className="hero-actions">
-          <button className="primary-btn" type="button" onClick={irLogin}>
-            Ir a login
+          <button className="primary-btn" type="button" onClick={irDemo}>
+            Probar demo
           </button>
           <Link className="ghost-btn" to="/endpoints">
             Ver endpoints

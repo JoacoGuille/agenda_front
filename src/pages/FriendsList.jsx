@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 const labelsEstado = {
   activo: 'Activo',
@@ -19,6 +21,11 @@ function FriendsList() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
+    if (esDemo()) {
+      setAmigos(datosDemo.amigos)
+      setCargando(false)
+      return
+    }
     let activo = true
     apiFetch('/friends')
       .then((info) => {

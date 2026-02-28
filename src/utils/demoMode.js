@@ -1,0 +1,1 @@
+export const esDemo = () => localStorage.getItem('token') === 'demo-token'

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 const normalizarLista = (info) => {
   if (Array.isArray(info)) return info
@@ -13,6 +15,11 @@ function CategoriesList() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
+    if (esDemo()) {
+      setCategorias(datosDemo.categorias)
+      setCargando(false)
+      return
+    }
     let activo = true
     apiFetch('/categories')
       .then((info) => {

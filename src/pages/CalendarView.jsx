@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../services/api.js'
 import useDragScroll from '../hooks/useDragScroll.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 const diasCorto = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 const ordenSemana = [1, 2, 3, 4, 5, 6, 0]
@@ -78,6 +80,18 @@ const armarMapa = (items) => {
   }, {})
 }
 
+const filtrarRango = (lista, desde, hasta) => {
+  const desdeDate = new Date(`${desde}T00:00:00`)
+  const hastaDate = new Date(`${hasta}T23:59:59`)
+  return lista.filter((evento) => {
+    const base = evento.startAt || evento.start || evento.date
+    if (!base) return false
+    const fecha = new Date(base)
+    if (Number.isNaN(fecha.getTime())) return false
+    return fecha >= desdeDate && fecha <= hastaDate
+  })
+}
+
 function CalendarView() {
   const [eventos, setEventos] = useState([])
   const [vista, setVista] = useState('week')
@@ -92,6 +106,12 @@ function CalendarView() {
 
   const cargarRango = async (desde, hasta) => {
     setCargando(true)
+    if (esDemo()) {
+      const lista = filtrarRango(datosDemo.eventos, desde, hasta)
+      setEventos(normalizarEventos(lista))
+      setCargando(false)
+      return
+    }
     try {
       const info = await apiFetch(`/events?from=${desde}&to=${hasta}`)
       setEventos(normalizarEventos(info))

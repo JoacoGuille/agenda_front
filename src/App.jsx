@@ -1,5 +1,6 @@
 ﻿import './App.css'
-import { Route, Routes } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
@@ -25,43 +26,56 @@ import GroupForm from './pages/GroupForm.jsx'
 import Notifications from './pages/Notifications.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+}
+
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Register />} />
-      <Route path="/recuperar" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/verify" element={<VerifyEmail />} />
-      <Route path="/endpoints" element={<ApiDocs />} />
-      <Route
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/eventos" element={<EventsList />} />
-        <Route path="/eventos/nuevo" element={<EventForm />} />
-        <Route path="/eventos/:id" element={<EventDetail />} />
-        <Route path="/eventos/:id/editar" element={<EventForm />} />
-        <Route path="/categorias" element={<CategoriesList />} />
-        <Route path="/categorias/nueva" element={<CategoryForm />} />
-        <Route path="/categorias/:id" element={<CategoryDetail />} />
-        <Route path="/categorias/:id/editar" element={<CategoryForm />} />
-        <Route path="/calendario" element={<CalendarView />} />
-        <Route path="/amigos" element={<FriendsList />} />
-        <Route path="/amigos/nuevo" element={<FriendForm />} />
-        <Route path="/amigos/:id" element={<FriendDetail />} />
-        <Route path="/grupos" element={<GroupsList />} />
-        <Route path="/grupos/nuevo" element={<GroupForm />} />
-        <Route path="/grupos/:id" element={<GroupDetail />} />
-        <Route path="/grupos/:id/editar" element={<GroupForm />} />
-        <Route path="/notificaciones" element={<Notifications />} />
-      </Route>
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Register />} />
+        <Route path="/recuperar" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify" element={<VerifyEmail />} />
+        <Route path="/endpoints" element={<ApiDocs />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/eventos" element={<EventsList />} />
+          <Route path="/eventos/nuevo" element={<EventForm />} />
+          <Route path="/eventos/:id" element={<EventDetail />} />
+          <Route path="/eventos/:id/editar" element={<EventForm />} />
+          <Route path="/categorias" element={<CategoriesList />} />
+          <Route path="/categorias/nueva" element={<CategoryForm />} />
+          <Route path="/categorias/:id" element={<CategoryDetail />} />
+          <Route path="/categorias/:id/editar" element={<CategoryForm />} />
+          <Route path="/calendario" element={<CalendarView />} />
+          <Route path="/amigos" element={<FriendsList />} />
+          <Route path="/amigos/nuevo" element={<FriendForm />} />
+          <Route path="/amigos/:id" element={<FriendDetail />} />
+          <Route path="/grupos" element={<GroupsList />} />
+          <Route path="/grupos/nuevo" element={<GroupForm />} />
+          <Route path="/grupos/:id" element={<GroupDetail />} />
+          <Route path="/grupos/:id/editar" element={<GroupForm />} />
+          <Route path="/notificaciones" element={<Notifications />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
 

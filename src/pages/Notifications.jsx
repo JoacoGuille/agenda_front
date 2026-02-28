@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 const normalizarLista = (info) => {
   if (Array.isArray(info)) return info
@@ -11,8 +13,14 @@ const normalizarLista = (info) => {
 function Notifications() {
   const [notis, setNotis] = useState([])
   const [cargando, setCargando] = useState(true)
+  const totalNotis = notis.length
 
   useEffect(() => {
+    if (esDemo()) {
+      setNotis(datosDemo.notificaciones)
+      setCargando(false)
+      return
+    }
     let activo = true
     apiFetch('/notifications')
       .then((info) => {
@@ -29,7 +37,15 @@ function Notifications() {
     }
   }, [])
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('noti-count', { detail: totalNotis }))
+  }, [totalNotis])
+
   const resolverNoti = async (id, accion) => {
+    if (esDemo()) {
+      setNotis((previas) => previas.filter((item) => item.id !== id))
+      return
+    }
     try {
       await apiFetch(`/notifications/${id}/${accion}`, { method: 'POST' })
       setNotis((previas) => previas.filter((item) => item.id !== id))

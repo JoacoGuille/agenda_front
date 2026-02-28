@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
 
 function FriendForm() {
   const irA = useNavigate()
@@ -15,6 +16,14 @@ function FriendForm() {
     setCargando(true)
     const infoForm = new FormData(evento.currentTarget)
     const correo = infoForm.get('email')
+
+    if (esDemo()) {
+      setMensajeOk('Invitacion enviada.')
+      evento.currentTarget.reset()
+      setTimeout(() => irA('/amigos'), 800)
+      setCargando(false)
+      return
+    }
 
     try {
       await apiFetch('/friends/invite', {

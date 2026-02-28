@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 const labelsEstado = {
   programado: 'Programado',
@@ -34,6 +36,22 @@ function EventsList() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
+    if (esDemo()) {
+      const lista = normalizarLista(datosDemo.eventos).map((evento) => {
+        const inicio = evento.startAt || evento.start
+        return {
+          ...evento,
+          fechaTxt: evento.date || formatearFecha(inicio),
+          horaTxt: evento.time || formatearHora(inicio),
+          categoriaTxt:
+            evento.category?.name || evento.categoryName || evento.category || 'Sin categoria',
+          estado: evento.status || 'programado',
+        }
+      })
+      setEventos(lista)
+      setCargando(false)
+      return
+    }
     let activo = true
     apiFetch('/events')
       .then((info) => {

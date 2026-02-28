@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
+import { esDemo } from '../utils/demoMode.js'
+import { datosDemo } from '../data/datosDemo.js'
 
 const labelsEstado = {
   programado: 'Programado',
@@ -29,6 +31,12 @@ function EventDetail() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
+    if (esDemo()) {
+      const encontrado = datosDemo.eventos.find((item) => item.id === id)
+      setEvento(encontrado || null)
+      setCargando(false)
+      return
+    }
     let activo = true
     apiFetch(`/events/${id}`)
       .then((info) => {
