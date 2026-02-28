@@ -9,35 +9,41 @@ function Register() {
   const [cargando, setCargando] = useState(false)
 
   const mandarForm = async (evento) => {
-    evento.preventDefault()
-    setMensajeError('')
-    setMensajeOk('')
-    setCargando(true)
-    const infoForm = new FormData(evento.currentTarget)
-    const nombre = infoForm.get('name')
-    const correo = infoForm.get('email')
-    const clave = infoForm.get('password')
-    const repetir = infoForm.get('confirmPassword')
+  evento.preventDefault()
 
-    if (clave !== repetir) {
-      setMensajeError('Las contrasenas no coinciden.')
-      setCargando(false)
-      return
-    }
+  const form = evento.currentTarget
 
-    try {
-      await apiFetch('/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({ name: nombre, email: correo, password: clave }),
-      })
-      setMensajeOk('Listo. Revisa tu mail para verificar la cuenta.')
-      evento.currentTarget.reset()
-    } catch (err) {
-      setMensajeError(err.message || 'No se pudo crear la cuenta.')
-    } finally {
-      setCargando(false)
-    }
+  setMensajeError('')
+  setMensajeOk('')
+  setCargando(true)
+
+  const infoForm = new FormData(form)
+  const nombre = infoForm.get('name')
+  const correo = infoForm.get('email')
+  const clave = infoForm.get('password')
+  const repetir = infoForm.get('confirmPassword')
+
+  if (clave !== repetir) {
+    setMensajeError('Las contrasenas no coinciden.')
+    setCargando(false)
+    return
   }
+
+  try {
+    await apiFetch('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name: nombre, email: correo, password: clave }),
+    })
+
+    setMensajeOk('Listo. Revisa tu mail para verificar la cuenta.')
+    form.reset()   
+
+  } catch (err) {
+    setMensajeError(err.message || 'No se pudo crear la cuenta.')
+  } finally {
+    setCargando(false)
+  }
+}
 
   return (
     <AuthLayout
