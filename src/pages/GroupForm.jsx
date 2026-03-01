@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 function GroupForm() {
   const { id } = useParams()
@@ -14,6 +15,7 @@ function GroupForm() {
 
   const [cargando, setCargando] = useState(false)
   const [mensajeError, setMensajeError] = useState('')
+  const [grupoId, setGrupoId] = useState(obtenerId(grupoInicial) || id)
   const [formulario, setFormulario] = useState({
     name: grupoInicial?.name || grupoInicial?.group?.name || '',
     description: grupoInicial?.description || grupoInicial?.group?.description || '',
@@ -27,6 +29,7 @@ function GroupForm() {
         setMensajeError('No se pudo cargar el grupo.')
         return
       }
+      setGrupoId(obtenerId(grupo) || id)
       setFormulario({
         name: grupo.name || '',
         description: grupo.description || '',
@@ -36,6 +39,7 @@ function GroupForm() {
     apiFetch(`/groups/${id}`)
       .then((info) => {
         const grupo = info.data || info.group || info
+        setGrupoId(obtenerId(grupo) || id)
         setFormulario({
           name: grupo.name || '',
           description: grupo.description || '',
@@ -65,8 +69,9 @@ function GroupForm() {
     }
 
     try {
+      const idApi = grupoId || id
       if (esEdicion) {
-        await apiFetch(`/groups/${id}`, {
+        await apiFetch(`/groups/${idApi}`, {
           method: 'PUT',
           body: JSON.stringify({ name: formulario.name, description: formulario.description }),
         })
@@ -93,7 +98,8 @@ function GroupForm() {
     }
     setCargando(true)
     try {
-      await apiFetch(`/groups/${id}`, { method: 'DELETE' })
+      const idApi = grupoId || id
+      await apiFetch(`/groups/${idApi}`, { method: 'DELETE' })
       irA(volverA)
     } catch (err) {
       setMensajeError(err.message || 'No se pudo eliminar el grupo.')
