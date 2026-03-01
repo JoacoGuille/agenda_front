@@ -8,24 +8,27 @@ function VerifyEmail() {
   const [estadoVerif, setEstadoVerif] = useState('cargando')
   const [texto, setTexto] = useState('Verificando tu cuenta...')
 
-  useEffect(() => {
-    const tokenLink = new URLSearchParams(ubicacion.search).get('token')
-    if (!tokenLink) {
-      setEstadoVerif('error')
-      setTexto('El link de verificacion es invalido.')
-      return
-    }
+    useEffect(() => {
+      const tokenLink = new URLSearchParams(ubicacion.search).get('token')
 
-    apiFetch(`/api/auth/verify-email?token=${encodeURIComponent(tokenLink)}`)
-      .then(() => {
-        setEstadoVerif('ok')
-        setTexto('Cuenta verificada. Ya podes iniciar sesion.')
-      })
-      .catch((err) => {
+      if (!tokenLink) {
         setEstadoVerif('error')
-        setTexto(err.message || 'No se pudo verificar el correo.')
-      })
-  }, [ubicacion.search])
+        setTexto('El link de verificacion es invalido.')
+        return
+      }
+
+      // IMPORTANTE: NO poner /api/auth
+      apiFetch(`/auth/verify-email?token=${encodeURIComponent(tokenLink)}`)
+        .then(() => {
+          setEstadoVerif('ok')
+          setTexto('Cuenta verificada. Ya podes iniciar sesion.')
+        })
+        .catch((err) => {
+          setEstadoVerif('error')
+          setTexto(err.message || 'No se pudo verificar el correo.')
+        })
+
+    }, [ubicacion.search])
 
   return (
     <AuthLayout
