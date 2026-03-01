@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 const labelsEstado = {
   programado: 'Programado',
@@ -15,6 +16,12 @@ const normalizarLista = (info) => {
   if (Array.isArray(info)) return info
   if (!info || typeof info !== 'object') return []
   return info.events || info.items || info.data || []
+}
+
+const normalizarCategorias = (info) => {
+  if (Array.isArray(info)) return info
+  if (!info || typeof info !== 'object') return []
+  return info.categories || info.items || info.data || []
 }
 
 const formatearFecha = (valor) => {
@@ -33,51 +40,73 @@ const formatearHora = (valor) => {
 
 function EventsList() {
   const [eventos, setEventos] = useState([])
+  const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     if (esDemo()) {
-      const lista = normalizarLista(datosDemo.eventos).map((evento) => {
-        const inicio = evento.startAt || evento.start
-        return {
-          ...evento,
-          fechaTxt: evento.date || formatearFecha(inicio),
-          horaTxt: evento.time || formatearHora(inicio),
-          categoriaTxt:
-            evento.category?.name || evento.categoryName || evento.category || 'Sin categoria',
-          estado: evento.status || 'programado',
-        }
-      })
-      setEventos(lista)
+      setEventos(normalizarLista(datosDemo.eventos))
+      setCategorias(normalizarCategorias(datosDemo.categorias))
       setCargando(false)
       return
     }
     let activo = true
-    apiFetch('/events')
-      .then((info) => {
-        const lista = normalizarLista(info).map((evento) => {
-          const inicio = evento.startAt || evento.start
-          return {
-            ...evento,
-            fechaTxt: evento.date || formatearFecha(inicio),
-            horaTxt: evento.time || formatearHora(inicio),
-            categoriaTxt:
-              evento.category?.name || evento.categoryName || evento.category || 'Sin categoria',
-            estado: evento.status || 'programado',
-          }
-        })
-        if (activo) {
-          setEventos(lista)
-          setCargando(false)
+    Promise.allSettled([apiFetch('/events'), apiFetch('/categories')])
+      .then(([eventosRes, categoriasRes]) => {
+        if (!activo) return
+        if (eventosRes.status === 'fulfilled') {
+          setEventos(normalizarLista(eventosRes.value))
+        } else {
+          setEventos([])
         }
-      })
-      .catch(() => {
-        if (activo) setCargando(false)
+        if (categoriasRes.status === 'fulfilled') {
+          setCategorias(normalizarCategorias(categoriasRes.value))
+        } else {
+          setCategorias([])
+        }
+        setCargando(false)
       })
     return () => {
       activo = false
     }
   }, [])
+
+  const mapaCategorias = useMemo(() => {
+    const mapa = {}
+    categorias.forEach((categoria) => {
+      const categoriaId = obtenerId(categoria)
+      if (!categoriaId) return
+      mapa[categoriaId] = categoria.name || categoria.title || categoria.label || ''
+    })
+    return mapa
+  }, [categorias])
+
+  const eventosVista = useMemo(
+    () =>
+      eventos.map((evento) => {
+        const inicio = evento.startAt || evento.start || evento.date
+        const categoriaId =
+          evento.categoryId ||
+          obtenerId(evento.category) ||
+          (typeof evento.category === 'string' ? evento.category : null)
+        const categoriaTxt =
+          evento.category?.name ||
+          evento.categoryName ||
+          (categoriaId && mapaCategorias[categoriaId]) ||
+          (typeof evento.category === 'string' ? evento.category : null) ||
+          'Sin categoria'
+
+        return {
+          ...evento,
+          eventoId: obtenerId(evento),
+          fechaTxt: evento.date || formatearFecha(inicio),
+          horaTxt: evento.time || formatearHora(inicio),
+          categoriaTxt,
+          estado: evento.status || 'programado',
+        }
+      }),
+    [eventos, mapaCategorias],
+  )
 
   return (
     <section className="page">
@@ -116,8 +145,8 @@ function EventsList() {
                 <td colSpan="5">No hay eventos cargados.</td>
               </tr>
             )}
-            {eventos.map((evento) => (
-              <tr key={evento.id}>
+            {eventosVista.map((evento, index) => (
+              <tr key={evento.eventoId || `${evento.title || 'evento'}-${index}`}>
                 <td>
                   <div className="table-main">
                     <p>{evento.title || evento.name}</p>
@@ -138,10 +167,16 @@ function EventsList() {
                 </td>
                 <td>
                   <div className="table-actions">
-                    <Link className="ghost-btn small" to={`/eventos/${evento.id}`}>
+                    <Link
+                      className="ghost-btn small"
+                      to={evento.eventoId ? `/eventos/${evento.eventoId}` : '/eventos'}
+                    >
                       Ver
                     </Link>
-                    <Link className="ghost-btn small" to={`/eventos/${evento.id}/editar`}>
+                    <Link
+                      className="ghost-btn small"
+                      to={evento.eventoId ? `/eventos/${evento.eventoId}/editar` : '/eventos'}
+                    >
                       Editar
                     </Link>
                   </div>

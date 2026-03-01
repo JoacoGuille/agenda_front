@@ -1,8 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 const labelsEstado = {
   programado: 'Programado',
@@ -28,12 +29,14 @@ const formatearHora = (valor) => {
 function EventDetail() {
   const { id } = useParams()
   const [evento, setEvento] = useState(null)
+  const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     if (esDemo()) {
       const encontrado = datosDemo.eventos.find((item) => item.id === id)
       setEvento(encontrado || null)
+      setCategorias(datosDemo.categorias || [])
       setCargando(false)
       return
     }
@@ -52,6 +55,33 @@ function EventDetail() {
       activo = false
     }
   }, [id])
+
+  useEffect(() => {
+    if (esDemo()) return
+    let activo = true
+    apiFetch('/categories')
+      .then((info) => {
+        if (!activo) return
+        const lista = Array.isArray(info) ? info : info.categories || info.items || info.data || []
+        setCategorias(lista)
+      })
+      .catch(() => {
+        if (activo) setCategorias([])
+      })
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const mapaCategorias = useMemo(() => {
+    const mapa = {}
+    categorias.forEach((categoria) => {
+      const categoriaId = obtenerId(categoria)
+      if (!categoriaId) return
+      mapa[categoriaId] = categoria.name || categoria.title || categoria.label || ''
+    })
+    return mapa
+  }, [categorias])
 
   if (cargando) {
     return (
@@ -88,8 +118,17 @@ function EventDetail() {
   const inicio = evento.startAt || evento.start || evento.date
   const fechaTxt = evento.date || formatearFecha(inicio)
   const horaTxt = evento.time || formatearHora(inicio)
+  const categoriaId =
+    evento.categoryId ||
+    obtenerId(evento.category) ||
+    (typeof evento.category === 'string' ? evento.category : null)
   const categoriaTxt =
-    evento.category?.name || evento.categoryName || evento.category || 'Sin categoria'
+    evento.category?.name ||
+    evento.categoryName ||
+    (categoriaId && mapaCategorias[categoriaId]) ||
+    (typeof evento.category === 'string' ? evento.category : null) ||
+    'Sin categoria'
+  const eventoId = obtenerId(evento) || id
 
   return (
     <section className="page">
@@ -107,7 +146,7 @@ function EventDetail() {
           <Link className="ghost-btn" to="/eventos">
             Volver
           </Link>
-          <Link className="primary-btn" to={`/eventos/${evento.id}/editar`}>
+          <Link className="primary-btn" to={`/eventos/${eventoId}/editar`}>
             Editar evento
           </Link>
         </div>
@@ -138,7 +177,7 @@ function EventDetail() {
         <div className="panel">
           <h3>Acciones</h3>
           <p className="detail-text">Si queres eliminarlo, entra a la edicion.</p>
-          <Link className="ghost-btn" to={`/eventos/${evento.id}/editar`}>
+          <Link className="ghost-btn" to={`/eventos/${eventoId}/editar`}>
             Ir a editar
           </Link>
         </div>
