@@ -23,6 +23,7 @@ import FriendForm from './pages/FriendForm.jsx'
 import GroupsList from './pages/GroupsList.jsx'
 import GroupDetail from './pages/GroupDetail.jsx'
 import GroupForm from './pages/GroupForm.jsx'
+import GroupJoin from './pages/GroupJoin.jsx'
 import Notifications from './pages/Notifications.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
@@ -48,6 +49,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify" element={<VerifyEmail />} />
         <Route path="/endpoints" element={<ApiDocs />} />
+        <Route path="/grupos/join" element={<GroupJoin />} />
         <Route
           element={
             <ProtectedRoute>
