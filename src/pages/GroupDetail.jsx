@@ -11,6 +11,7 @@ function GroupDetail() {
   const grupoInicial = ubicacion.state?.grupo || null
   const [grupo, setGrupo] = useState(grupoInicial)
   const [linkInvitacion, setLinkInvitacion] = useState('')
+  const [copiado, setCopiado] = useState(false)
   const [cargando, setCargando] = useState(!grupoInicial)
 
   useEffect(() => {
@@ -39,14 +40,42 @@ function GroupDetail() {
   const generarLink = async () => {
     if (esDemo()) {
       setLinkInvitacion('https://upagenda.demo/invite/TP-Sistemas')
+      setCopiado(false)
       return
     }
     try {
       const info = await apiFetch(`/groups/${id}/invite-link`, { method: 'POST' })
       const link = info.link || info.inviteLink || info.url
-      if (link) setLinkInvitacion(link)
+      if (link) {
+        setLinkInvitacion(link)
+        setCopiado(false)
+      }
     } catch {
       setLinkInvitacion('No se pudo generar el link.')
+      setCopiado(false)
+    }
+  }
+
+  const copiarLink = async () => {
+    if (!linkInvitacion || !linkInvitacion.startsWith('http')) return
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(linkInvitacion)
+      } else {
+        const input = document.createElement('textarea')
+        input.value = linkInvitacion
+        input.setAttribute('readonly', '')
+        input.style.position = 'absolute'
+        input.style.left = '-9999px'
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+      }
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 1500)
+    } catch {
+      setCopiado(false)
     }
   }
 
@@ -85,6 +114,7 @@ function GroupDetail() {
   const nombre = grupo.name || grupo.group?.name || 'Grupo'
   const descripcion = grupo.description || grupo.group?.description || 'Sin descripcion'
   const grupoId = obtenerId(grupo) || id
+  const linkValido = linkInvitacion && linkInvitacion.startsWith('http')
 
   return (
     <section className="page">
@@ -129,7 +159,16 @@ function GroupDetail() {
           <button className="ghost-btn" type="button" onClick={generarLink}>
             Generar link
           </button>
-          {linkInvitacion && <p className="detail-text">{linkInvitacion}</p>}
+          {linkInvitacion && (
+            <div className="detail-text">
+              <p>{linkInvitacion}</p>
+              {linkValido && (
+                <button className="primary-btn small" type="button" onClick={copiarLink}>
+                  {copiado ? 'Copiado' : 'Copiar link'}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>

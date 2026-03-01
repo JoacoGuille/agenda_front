@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 function EventForm() {
   const { id } = useParams()
@@ -59,7 +60,7 @@ function EventForm() {
         title: evento.title || evento.name || '',
         date: fecha,
         time: hora,
-        categoryId: evento.categoryId || evento.category?.id || '',
+        categoryId: evento.categoryId || obtenerId(evento.category) || '',
         location: evento.location || '',
         status: evento.status || 'programado',
         description: evento.description || '',
@@ -83,7 +84,7 @@ function EventForm() {
           title: evento.title || evento.name || '',
           date: fecha,
           time: hora,
-          categoryId: evento.categoryId || evento.category?.id || '',
+          categoryId: evento.categoryId || obtenerId(evento.category) || '',
           location: evento.location || '',
           status: evento.status || 'programado',
           description: evento.description || '',
@@ -224,11 +225,14 @@ function EventForm() {
               <option value="" disabled>
                 Elegi una categoria
               </option>
-              {categorias.map((categoria) => (
-                <option key={categoria.id} value={categoria.id}>
-                  {categoria.name}
-                </option>
-              ))}
+              {categorias.map((categoria) => {
+                const categoriaId = obtenerId(categoria)
+                return (
+                  <option key={categoriaId || categoria.name} value={categoriaId || ''} disabled={!categoriaId}>
+                    {categoria.name || categoria.title || 'Sin nombre'}
+                  </option>
+                )
+              })}
             </select>
           </label>
 
