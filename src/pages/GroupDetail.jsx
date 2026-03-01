@@ -159,15 +159,10 @@ function GroupDetail() {
           <button className="ghost-btn" type="button" onClick={generarLink}>
             Generar link
           </button>
-          {linkInvitacion && (
-            <div className="detail-text">
-              <p>{linkInvitacion}</p>
-              {linkValido && (
-                <button className="primary-btn small" type="button" onClick={copiarLink}>
-                  {copiado ? 'Copiado' : 'Copiar link'}
-                </button>
-              )}
-            </div>
+          {linkValido && (
+            <button className="primary-btn small" type="button" onClick={copiarLink}>
+              {copiado ? 'Copiado' : 'Copiar link'}
+            </button>
           )}
         </div>
       </div>
