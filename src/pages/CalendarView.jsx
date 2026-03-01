@@ -4,6 +4,7 @@ import { apiFetch } from '../services/api.js'
 import useDragScroll from '../hooks/useDragScroll.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 const diasCorto = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 const ordenSemana = [1, 2, 3, 4, 5, 6, 0]
@@ -22,7 +23,7 @@ const meses = [
   'Diciembre',
 ]
 
-const horas = Array.from({ length: 18 }, (_, i) => 6 + i)
+const horas = Array.from({ length: 24 }, (_, i) => i)
 
 const rellenar = (valor) => String(valor).padStart(2, '0')
 
@@ -214,21 +215,29 @@ function CalendarView() {
               )
               return (
                 <div key={`${clave}-${hora}`} className="schedule-cell">
-                  {eventosHora.map((evento) => (
-                    <div key={evento.id} className={`schedule-event status-${evento.status}`}>
-                      <Link className="schedule-event-title" to={`/eventos/${evento.id}`}>
-                        {evento.title}
-                      </Link>
-                      <p className="schedule-event-meta">{evento.time}</p>
-                      <Link
-                        className="ghost-btn small"
-                        to={`/eventos/${evento.id}/editar`}
-                        state={{ from: '/calendario' }}
+                  {eventosHora.map((evento, index) => {
+                    const eventoId = obtenerId(evento)
+                    const destino = eventoId ? `/eventos/${eventoId}` : '/eventos'
+                    const destinoEditar = eventoId ? `/eventos/${eventoId}/editar` : '/eventos'
+                    return (
+                      <div
+                        key={eventoId || `${evento.title || 'evento'}-${index}`}
+                        className={`schedule-event status-${evento.status}`}
                       >
-                        Editar
-                      </Link>
-                    </div>
-                  ))}
+                        <Link className="schedule-event-title" to={destino}>
+                          {evento.title}
+                        </Link>
+                        <p className="schedule-event-meta">{evento.time}</p>
+                        <Link
+                          className="ghost-btn small"
+                          to={destinoEditar}
+                          state={{ from: '/calendario' }}
+                        >
+                          Editar
+                        </Link>
+                      </div>
+                    )
+                  })}
                 </div>
               )
             })}
@@ -276,16 +285,22 @@ function CalendarView() {
                     {eventosHora.length === 0 ? (
                       <p className="day-empty">Libre</p>
                     ) : (
-                      eventosHora.map((evento) => (
-                        <div key={evento.id} className={`schedule-event status-${evento.status}`}>
-                          <Link className="schedule-event-title" to={`/eventos/${evento.id}`}>
-                            {evento.title}
-                          </Link>
-                          <p className="schedule-event-meta">
-                            {evento.time} ? {evento.location}
-                          </p>
-                        </div>
-                      ))
+                      eventosHora.map((evento, index) => {
+                        const eventoId = obtenerId(evento)
+                        const destino = eventoId ? `/eventos/${eventoId}` : '/eventos'
+                        const meta = [evento.time, evento.location].filter(Boolean).join(' - ')
+                        return (
+                          <div
+                            key={eventoId || `${evento.title || 'evento'}-${index}`}
+                            className={`schedule-event status-${evento.status}`}
+                          >
+                            <Link className="schedule-event-title" to={destino}>
+                              {evento.title}
+                            </Link>
+                            {meta && <p className="schedule-event-meta">{meta}</p>}
+                          </div>
+                        )
+                      })
                     )}
                   </div>
                 </div>
@@ -339,23 +354,26 @@ function CalendarView() {
             <p className="day-empty">No hay eventos para este dia.</p>
           ) : (
             <div className="month-events">
-              {eventosElegidos.map((evento) => (
-                <div key={evento.id} className="month-event">
-                  <div>
-                    <p className="month-event-title">{evento.title}</p>
-                    <p className="month-event-meta">
-                      {evento.time} ? {evento.location}
-                    </p>
+              {eventosElegidos.map((evento, index) => {
+                const eventoId = obtenerId(evento)
+                const destinoEditar = eventoId ? `/eventos/${eventoId}/editar` : '/eventos'
+                const meta = [evento.time, evento.location].filter(Boolean).join(' - ')
+                return (
+                  <div key={eventoId || `${evento.title || 'evento'}-${index}`} className="month-event">
+                    <div>
+                      <p className="month-event-title">{evento.title}</p>
+                      {meta && <p className="month-event-meta">{meta}</p>}
+                    </div>
+                    <Link
+                      className="ghost-btn small"
+                      to={destinoEditar}
+                      state={{ from: '/calendario' }}
+                    >
+                      Editar
+                    </Link>
                   </div>
-                  <Link
-                    className="ghost-btn small"
-                    to={`/eventos/${evento.id}/editar`}
-                    state={{ from: '/calendario' }}
-                  >
-                    Editar
-                  </Link>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
           <Link className="primary-btn" to="/eventos/nuevo" state={{ from: '/calendario' }}>

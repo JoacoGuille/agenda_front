@@ -18,7 +18,6 @@ function VerifyEmail() {
         return
       }
 
-      // IMPORTANTE: NO poner /api/auth
       apiFetch(`/auth/verify-email?token=${encodeURIComponent(tokenLink)}`)
         .then(() => {
           setEstadoVerif('ok')
