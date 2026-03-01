@@ -127,49 +127,56 @@ function GroupJoin() {
   }
 
   return (
-    <section className="page">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Invitacion</p>
-          <h1>Unite al grupo</h1>
-          <p className="page-subtitle">
-            Confirmamos el link. Si queres, podes unirte ahora.
-          </p>
+    <section className="page join-page">
+      <div className="join-shell">
+        <div className="join-hero">
+          <div>
+            <p className="eyebrow">Invitacion</p>
+            <h1>Unite al grupo</h1>
+            <p className="join-subtitle">
+              Confirmamos el link. Si queres, podes unirte ahora.
+            </p>
+          </div>
+          <div className="join-actions">
+            <Link className="ghost-btn" to="/">
+              Volver
+            </Link>
+          </div>
         </div>
-        <div className="page-actions">
-          <Link className="ghost-btn" to="/">
-            Volver
-          </Link>
-        </div>
-      </div>
 
-      <div className="detail-grid">
-        <div className="panel">
-          <h3>{nombre}</h3>
-          <p className="detail-text">{descripcion}</p>
-          <div className="detail-list">
-            <div>
-              <p className="detail-label">Miembros</p>
-              <p className="detail-value">{miembros}</p>
+        <div className="join-grid">
+          <article className="join-card">
+            <div className="join-card-header">
+              <div>
+                <h2>{nombre}</h2>
+                <p>{descripcion}</p>
+              </div>
+              <span className="join-badge">Grupo</span>
             </div>
-          </div>
-        </div>
+            <div className="join-meta">
+              <div className="join-metric">
+                <p className="join-metric-label">Miembros</p>
+                <p className="join-metric-value">{miembros}</p>
+              </div>
+            </div>
+          </article>
 
-        <div className="panel">
-          <h3>Acciones</h3>
-          <p className="detail-text">Para sumarte necesitas estar logueado.</p>
-          {mensajeError && <p className="auth-error">{mensajeError}</p>}
-          {mensajeOk && <p className="auth-success">{mensajeOk}</p>}
-          <div className="page-actions">
-            <button className="primary-btn" type="button" onClick={unirse} disabled={uniendo}>
-              {uniendo ? 'Uniendo...' : 'Unirme al grupo'}
-            </button>
-            {!haySesion() && (
-              <Link className="ghost-btn" to="/login">
-                Ir a login
-              </Link>
-            )}
-          </div>
+          <article className="join-card join-card-actions">
+            <h3>Acciones</h3>
+            <p className="detail-text">Para sumarte necesitas estar logueado.</p>
+            {mensajeError && <p className="auth-error">{mensajeError}</p>}
+            {mensajeOk && <p className="auth-success">{mensajeOk}</p>}
+            <div className="join-actions">
+              <button className="primary-btn" type="button" onClick={unirse} disabled={uniendo}>
+                {uniendo ? 'Uniendo...' : 'Unirme al grupo'}
+              </button>
+              {!haySesion() && (
+                <Link className="ghost-btn" to="/login">
+                  Ir a login
+                </Link>
+              )}
+            </div>
+          </article>
         </div>
       </div>
     </section>

@@ -141,14 +141,30 @@ function GroupDetail() {
             <p className="detail-text">Todavia no hay miembros.</p>
           ) : (
             <ul className="panel-list">
-              {miembros.map((miembro) => (
-                <li key={miembro.id || miembro.email} className="panel-item">
-                  <div>
-                    <p className="panel-title">{miembro.name}</p>
-                    <p className="panel-subtitle">{miembro.email}</p>
-                  </div>
-                </li>
-              ))}
+              {miembros.map((miembro, index) => {
+                const nombre =
+                  miembro?.name ||
+                  miembro?.user?.name ||
+                  miembro?.profile?.name ||
+                  miembro?.member?.name ||
+                  (typeof miembro === 'string' ? 'Miembro' : 'Sin nombre')
+                const email =
+                  miembro?.email ||
+                  miembro?.user?.email ||
+                  miembro?.profile?.email ||
+                  miembro?.member?.email ||
+                  (typeof miembro === 'string' ? miembro : 'Sin email')
+                const key = obtenerId(miembro) || email || `${nombre}-${index}`
+
+                return (
+                  <li key={key} className="panel-item">
+                    <div>
+                      <p className="panel-title">{nombre}</p>
+                      <p className="panel-subtitle">{email}</p>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           )}
         </div>
