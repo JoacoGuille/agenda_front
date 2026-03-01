@@ -11,15 +11,16 @@ function FriendForm() {
 
   const mandarForm = async (evento) => {
     evento.preventDefault()
+    const form = evento.currentTarget
     setMensajeError('')
     setMensajeOk('')
     setCargando(true)
-    const infoForm = new FormData(evento.currentTarget)
+    const infoForm = new FormData(form)
     const correo = infoForm.get('email')
 
     if (esDemo()) {
       setMensajeOk('Invitacion enviada.')
-      evento.currentTarget.reset()
+      form.reset()
       setTimeout(() => irA('/amigos'), 800)
       setCargando(false)
       return
@@ -31,7 +32,7 @@ function FriendForm() {
         body: JSON.stringify({ email: correo }),
       })
       setMensajeOk('Invitacion enviada.')
-      evento.currentTarget.reset()
+      form.reset()
       setTimeout(() => irA('/amigos'), 800)
     } catch (err) {
       setMensajeError(err.message || 'No se pudo enviar la invitacion.')
