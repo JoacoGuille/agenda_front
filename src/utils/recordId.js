@@ -8,9 +8,14 @@ export const obtenerId = (item) => {
     item.groupId ??
     item.userId ??
     item.memberId ??
+    item.group?._id ??
     item.friend?.id ??
+    item.friend?._id ??
     item.user?.id ??
+    item.user?._id ??
     item.group?.id ??
+    item.member?._id ??
+    item.member?.id ??
     null
   )
 }
