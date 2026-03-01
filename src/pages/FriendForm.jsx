@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function FriendForm() {
   const irA = useNavigate()
@@ -35,7 +36,7 @@ function FriendForm() {
       form.reset()
       setTimeout(() => irA('/amigos'), 800)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo enviar la invitacion.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }

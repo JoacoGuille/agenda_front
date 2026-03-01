@@ -12,7 +12,12 @@ export const apiFetch = async (ruta, opciones = {}) => {
     },
   })
 
-  const datos = await respuesta.json()
+  let datos = null
+  try {
+    datos = await respuesta.json()
+  } catch {
+    datos = null
+  }
 
   if (!respuesta.ok) {
     if (respuesta.status === 401) {
@@ -20,7 +25,11 @@ export const apiFetch = async (ruta, opciones = {}) => {
       localStorage.removeItem('user')
       window.location.href = '/login'
     }
-    throw new Error(datos.message || 'Error')
+    const error = new Error(datos?.message || 'Error')
+    error.status = respuesta.status
+    error.errors = Array.isArray(datos?.errors) ? datos.errors : null
+    error.data = datos
+    throw error
   }
 
   return datos

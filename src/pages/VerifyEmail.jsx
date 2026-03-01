@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout.jsx'
 import { apiFetch } from '../services/api.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function VerifyEmail() {
   const ubicacion = useLocation()
@@ -25,7 +26,7 @@ function VerifyEmail() {
         })
         .catch((err) => {
           setEstadoVerif('error')
-          setTexto(err.message || 'No se pudo verificar el correo.')
+          setTexto(obtenerMensajeError(err))
         })
 
     }, [ubicacion.search])

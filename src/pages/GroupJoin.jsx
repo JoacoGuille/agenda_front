@@ -2,6 +2,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { haySesion } from '../utils/localAuth.js'
+import { esObjectId } from '../utils/idValidation.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 const URL_API = import.meta.env.VITE_API_URL
 
@@ -20,7 +22,7 @@ function GroupJoin() {
   const [uniendo, setUniendo] = useState(false)
 
   useEffect(() => {
-    if (!token || !groupId) {
+    if (!token || !groupId || !esObjectId(groupId)) {
       setMensajeError('El link es invalido o esta incompleto.')
       setCargando(false)
       return
@@ -68,7 +70,10 @@ function GroupJoin() {
       setMensajeError('Inicia sesion para unirte al grupo.')
       return
     }
-    if (!token || !groupId) return
+    if (!token || !groupId || !esObjectId(groupId)) {
+      setMensajeError('El link es invalido o esta incompleto.')
+      return
+    }
     setMensajeError('')
     setMensajeOk('')
     setUniendo(true)
@@ -80,7 +85,7 @@ function GroupJoin() {
       setMensajeOk('Listo. Ya sos parte del grupo.')
       setTimeout(() => irA(`/grupos/${groupId}`), 900)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo completar la invitacion.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setUniendo(false)
     }

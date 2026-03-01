@@ -4,6 +4,7 @@ import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
 import { obtenerId } from '../utils/recordId.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function GroupForm() {
   const { id } = useParams()
@@ -83,7 +84,7 @@ function GroupForm() {
       }
       irA(volverA)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo guardar el grupo.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }
@@ -102,7 +103,11 @@ function GroupForm() {
       await apiFetch(`/groups/${idApi}`, { method: 'DELETE' })
       irA(volverA)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo eliminar el grupo.')
+      if (err?.status === 403) {
+        setMensajeError('No tenes permisos para borrar este grupo.')
+      } else {
+        setMensajeError(obtenerMensajeError(err))
+      }
     } finally {
       setCargando(false)
     }

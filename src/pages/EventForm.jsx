@@ -4,6 +4,8 @@ import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
 import { obtenerId } from '../utils/recordId.js'
+import { esObjectId } from '../utils/idValidation.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function EventForm() {
   const { id } = useParams()
@@ -111,6 +113,12 @@ function EventForm() {
       return
     }
 
+    if (formulario.categoryId && !esObjectId(formulario.categoryId)) {
+      setMensajeError('La categoria seleccionada es invalida.')
+      setCargando(false)
+      return
+    }
+
     const inicio =
       formulario.date && formulario.time
         ? new Date(`${formulario.date}T${formulario.time}:00`).toISOString()
@@ -121,7 +129,7 @@ function EventForm() {
       description: formulario.description,
       location: formulario.location,
       status: formulario.status,
-      categoryId: formulario.categoryId,
+      ...(esObjectId(formulario.categoryId) ? { categoryId: formulario.categoryId } : {}),
       ...(inicio ? { startAt: inicio } : {}),
     }
 
@@ -139,7 +147,7 @@ function EventForm() {
       }
       irA(volverA)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo guardar el evento.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }
@@ -157,7 +165,7 @@ function EventForm() {
       await apiFetch(`/events/${id}`, { method: 'DELETE' })
       irA(volverA)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo eliminar el evento.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }

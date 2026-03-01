@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function CategoryForm() {
   const { id } = useParams()
@@ -75,7 +76,7 @@ function CategoryForm() {
       }
       irA(volverA)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo guardar la categoria.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }
@@ -93,7 +94,7 @@ function CategoryForm() {
       await apiFetch(`/categories/${id}`, { method: 'DELETE' })
       irA(volverA)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo eliminar la categoria.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }

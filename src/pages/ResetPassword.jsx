@@ -3,6 +3,7 @@ import { useState } from 'react'
 import AuthLayout from '../components/AuthLayout.jsx'
 import { apiFetch } from '../services/api.js'
 import { validarContrasena } from '../utils/passwordRules.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function ResetPassword() {
   const irA = useNavigate()
@@ -47,7 +48,7 @@ function ResetPassword() {
       setMensajeOk('Contrasena actualizada. Ya podes ingresar.')
       setTimeout(() => irA('/login'), 1200)
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo actualizar la contrasena.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }

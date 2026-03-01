@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import AuthLayout from '../components/AuthLayout.jsx'
 import { apiFetch } from '../services/api.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function Login() {
   const irA = useNavigate()
@@ -25,7 +26,7 @@ function Login() {
       localStorage.setItem('user', JSON.stringify(respuesta.user))
       irA('/dashboard')
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo iniciar sesion.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }

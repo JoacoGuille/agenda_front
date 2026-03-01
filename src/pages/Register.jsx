@@ -3,6 +3,7 @@ import { useState } from 'react'
 import AuthLayout from '../components/AuthLayout.jsx'
 import { apiFetch } from '../services/api.js'
 import { validarContrasena } from '../utils/passwordRules.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function Register() {
   const [mensajeError, setMensajeError] = useState('')
@@ -47,7 +48,7 @@ function Register() {
     form.reset()   
 
   } catch (err) {
-    setMensajeError(err.message || 'No se pudo crear la cuenta.')
+    setMensajeError(obtenerMensajeError(err))
   } finally {
     setCargando(false)
   }

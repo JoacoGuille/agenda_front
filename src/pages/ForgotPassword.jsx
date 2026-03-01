@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import AuthLayout from '../components/AuthLayout.jsx'
 import { apiFetch } from '../services/api.js'
+import { obtenerMensajeError } from '../utils/apiError.js'
 
 function ForgotPassword() {
   const [mensajeError, setMensajeError] = useState('')
@@ -25,7 +26,7 @@ function ForgotPassword() {
       setMensajeOk('Si el mail existe, te llega el enlace para resetear.')
       form.reset()
     } catch (err) {
-      setMensajeError(err.message || 'No se pudo enviar el link.')
+      setMensajeError(obtenerMensajeError(err))
     } finally {
       setCargando(false)
     }
