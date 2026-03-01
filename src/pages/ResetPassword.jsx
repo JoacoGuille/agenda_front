@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import AuthLayout from '../components/AuthLayout.jsx'
 import { apiFetch } from '../services/api.js'
+import { validarContrasena } from '../utils/passwordRules.js'
 
 function ResetPassword() {
   const irA = useNavigate()
@@ -25,6 +26,12 @@ function ResetPassword() {
     const infoForm = new FormData(evento.currentTarget)
     const clave = infoForm.get('password')
     const repetir = infoForm.get('confirmPassword')
+
+    const errorClave = validarContrasena(clave)
+    if (errorClave) {
+      setMensajeError(errorClave)
+      return
+    }
 
     if (clave !== repetir) {
       setMensajeError('Las contrasenas no coinciden.')
@@ -62,7 +69,7 @@ function ResetPassword() {
           <input
             type="password"
             name="password"
-            placeholder="Minimo 8 caracteres"
+            placeholder="Minimo 8, 1 mayuscula, 1 numero y 1 simbolo"
             autoComplete="new-password"
             required
           />

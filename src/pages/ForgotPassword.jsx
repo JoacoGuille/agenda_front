@@ -10,10 +10,11 @@ function ForgotPassword() {
 
   const mandarForm = async (evento) => {
     evento.preventDefault()
+    const form = evento.currentTarget
     setMensajeError('')
     setMensajeOk('')
     setCargando(true)
-    const infoForm = new FormData(evento.currentTarget)
+    const infoForm = new FormData(form)
     const correo = infoForm.get('email')
 
     try {
@@ -22,7 +23,7 @@ function ForgotPassword() {
         body: JSON.stringify({ email: correo }),
       })
       setMensajeOk('Si el mail existe, te llega el enlace para resetear.')
-      evento.currentTarget.reset()
+      form.reset()
     } catch (err) {
       setMensajeError(err.message || 'No se pudo enviar el link.')
     } finally {

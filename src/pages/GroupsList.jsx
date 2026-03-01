@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 const normalizarLista = (info) => {
   if (Array.isArray(info)) return info
@@ -74,9 +75,15 @@ function GroupsList() {
                 <td colSpan="4">No hay grupos todavia.</td>
               </tr>
             )}
-            {grupos.map((grupo) => (
-              <tr key={grupo.id}>
-                <td>{grupo.name}</td>
+            {grupos.map((grupo) => {
+              const grupoId = obtenerId(grupo)
+              const nombre = grupo.name || grupo.group?.name || 'Sin nombre'
+              const rutaDetalle = grupoId ? `/grupos/${grupoId}` : '/grupos'
+              const rutaEditar = grupoId ? `/grupos/${grupoId}/editar` : '/grupos'
+
+              return (
+                <tr key={grupoId || nombre}>
+                  <td>{nombre}</td>
                 <td>{grupo.membersCount ?? grupo.members?.length ?? 0}</td>
                 <td>
                   <span className={`status status-${grupo.status || 'activo'}`}>
@@ -85,16 +92,17 @@ function GroupsList() {
                 </td>
                 <td>
                   <div className="table-actions">
-                    <Link className="ghost-btn small" to={`/grupos/${grupo.id}`}>
+                    <Link className="ghost-btn small" to={rutaDetalle} state={{ grupo }}>
                       Ver
                     </Link>
-                    <Link className="ghost-btn small" to={`/grupos/${grupo.id}/editar`}>
+                    <Link className="ghost-btn small" to={rutaEditar} state={{ grupo }}>
                       Editar
                     </Link>
                   </div>
                 </td>
-              </tr>
-            ))}
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

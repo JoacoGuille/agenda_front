@@ -10,12 +10,13 @@ function GroupForm() {
   const ubicacion = useLocation()
   const esEdicion = Boolean(id)
   const volverA = ubicacion.state?.from || '/grupos'
+  const grupoInicial = ubicacion.state?.grupo || null
 
   const [cargando, setCargando] = useState(false)
   const [mensajeError, setMensajeError] = useState('')
   const [formulario, setFormulario] = useState({
-    name: '',
-    description: '',
+    name: grupoInicial?.name || grupoInicial?.group?.name || '',
+    description: grupoInicial?.description || grupoInicial?.group?.description || '',
   })
 
   useEffect(() => {
@@ -34,13 +35,15 @@ function GroupForm() {
     }
     apiFetch(`/groups/${id}`)
       .then((info) => {
-        const grupo = info.data || info
+        const grupo = info.data || info.group || info
         setFormulario({
           name: grupo.name || '',
           description: grupo.description || '',
         })
       })
-      .catch(() => setMensajeError('No se pudo cargar el grupo.'))
+      .catch(() => {
+        if (!grupoInicial) setMensajeError('No se pudo cargar el grupo.')
+      })
   }, [id, esEdicion])
 
   const cambiarCampo = (evento) => {

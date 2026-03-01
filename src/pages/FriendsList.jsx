@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 const labelsEstado = {
   activo: 'Activo',
@@ -83,10 +84,16 @@ function FriendsList() {
                 <td colSpan="4">No hay amigos todavia.</td>
               </tr>
             )}
-            {amigos.map((amigo) => (
-              <tr key={amigo.id}>
-                <td>{amigo.name}</td>
-                <td>{amigo.email}</td>
+            {amigos.map((amigo) => {
+              const amigoId = obtenerId(amigo)
+              const nombre = amigo.name || amigo.friend?.name || amigo.user?.name || 'Sin nombre'
+              const email = amigo.email || amigo.friend?.email || amigo.user?.email || 'Sin email'
+              const rutaDetalle = amigoId ? `/amigos/${amigoId}` : '/amigos'
+
+              return (
+                <tr key={amigoId || email}>
+                  <td>{nombre}</td>
+                  <td>{email}</td>
                 <td>
                   <span className={`status status-${amigo.status || 'activo'}`}>
                     {labelsEstado[amigo.status] || 'Activo'}
@@ -94,13 +101,14 @@ function FriendsList() {
                 </td>
                 <td>
                   <div className="table-actions">
-                    <Link className="ghost-btn small" to={`/amigos/${amigo.id}`}>
+                    <Link className="ghost-btn small" to={rutaDetalle} state={{ amigo }}>
                       Ver
                     </Link>
                   </div>
                 </td>
-              </tr>
-            ))}
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import AuthLayout from '../components/AuthLayout.jsx'
 import { apiFetch } from '../services/api.js'
+import { validarContrasena } from '../utils/passwordRules.js'
 
 function Register() {
   const [mensajeError, setMensajeError] = useState('')
@@ -22,6 +23,13 @@ function Register() {
   const correo = infoForm.get('email')
   const clave = infoForm.get('password')
   const repetir = infoForm.get('confirmPassword')
+
+  const errorClave = validarContrasena(clave)
+  if (errorClave) {
+    setMensajeError(errorClave)
+    setCargando(false)
+    return
+  }
 
   if (clave !== repetir) {
     setMensajeError('Las contrasenas no coinciden.')
@@ -82,7 +90,7 @@ function Register() {
           <input
             type="password"
             name="password"
-            placeholder="Minimo 8 caracteres"
+            placeholder="Minimo 8, 1 mayuscula, 1 numero y 1 simbolo"
             autoComplete="new-password"
             required
           />

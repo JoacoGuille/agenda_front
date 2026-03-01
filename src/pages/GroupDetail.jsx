@@ -1,14 +1,17 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api.js'
 import { esDemo } from '../utils/demoMode.js'
 import { datosDemo } from '../data/datosDemo.js'
+import { obtenerId } from '../utils/recordId.js'
 
 function GroupDetail() {
   const { id } = useParams()
-  const [grupo, setGrupo] = useState(null)
+  const ubicacion = useLocation()
+  const grupoInicial = ubicacion.state?.grupo || null
+  const [grupo, setGrupo] = useState(grupoInicial)
   const [linkInvitacion, setLinkInvitacion] = useState('')
-  const [cargando, setCargando] = useState(true)
+  const [cargando, setCargando] = useState(!grupoInicial)
 
   useEffect(() => {
     if (esDemo()) {
@@ -21,7 +24,7 @@ function GroupDetail() {
     apiFetch(`/groups/${id}`)
       .then((info) => {
         if (activo) {
-          setGrupo(info.data || info)
+          setGrupo(info.data || info.group || info)
           setCargando(false)
         }
       })
@@ -78,21 +81,24 @@ function GroupDetail() {
     )
   }
 
-  const miembros = grupo.members || []
+  const miembros = grupo.members || grupo.users || grupo.group?.members || []
+  const nombre = grupo.name || grupo.group?.name || 'Grupo'
+  const descripcion = grupo.description || grupo.group?.description || 'Sin descripcion'
+  const grupoId = obtenerId(grupo) || id
 
   return (
     <section className="page">
       <div className="page-header">
         <div>
           <p className="eyebrow">Detalle</p>
-          <h1>{grupo.name}</h1>
-          <p className="page-subtitle">{grupo.description || 'Sin descripcion'}</p>
+          <h1>{nombre}</h1>
+          <p className="page-subtitle">{descripcion}</p>
         </div>
         <div className="page-actions">
           <Link className="ghost-btn" to="/grupos">
             Volver
           </Link>
-          <Link className="primary-btn" to={`/grupos/${grupo.id}/editar`}>
+          <Link className="primary-btn" to={`/grupos/${grupoId}/editar`} state={{ grupo }}>
             Editar grupo
           </Link>
         </div>
