@@ -138,8 +138,8 @@ function EventDetail() {
           <h1>{evento.title || evento.name}</h1>
           <p className="page-subtitle">
             {fechaTxt}
-            {horaTxt ? ` ? ${horaTxt}` : ''}
-            {evento.location ? ` ? ${evento.location}` : ''}
+            {horaTxt ? ` - ${horaTxt}` : ''}
+            {evento.location ? ` - ${evento.location}` : ''}
           </p>
         </div>
         <div className="page-actions">

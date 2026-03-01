@@ -155,7 +155,7 @@ function EventsList() {
                 </td>
                 <td>
                   {evento.fechaTxt}
-                  {evento.horaTxt ? ` ? ${evento.horaTxt}` : ''}
+                  {evento.horaTxt ? ` - ${evento.horaTxt}` : ''}
                 </td>
                 <td>
                   <span className="pill">{evento.categoriaTxt}</span>

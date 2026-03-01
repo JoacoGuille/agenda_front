@@ -111,7 +111,7 @@ function Dashboard() {
                   <p className="panel-title">{evento.title || evento.name}</p>
                   <p className="panel-subtitle">
                     {(evento.date || evento.startAt || evento.start) ?? ''}
-                    {evento.time ? ` ? ${evento.time}` : ''}
+                    {evento.time ? ` - ${evento.time}` : ''}
                   </p>
                 </div>
                 <span className="panel-tag">
@@ -164,7 +164,7 @@ function Dashboard() {
                   </Link>
                   <p className="calendar-mini-meta">
                     {(evento.date || evento.startAt || evento.start) ?? ''}
-                    {evento.time ? ` ? ${evento.time}` : ''}
+                    {evento.time ? ` - ${evento.time}` : ''}
                   </p>
                 </div>
                 <Link className="ghost-btn small" to={`/eventos/${evento.id}/editar`}>
