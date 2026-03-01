@@ -51,9 +51,15 @@ const normalizarLista = (info) => {
   return info.events || info.items || info.data || []
 }
 
+const obtenerInicio = (evento) => {
+  if (evento.startAt || evento.start) return evento.startAt || evento.start
+  if (evento.date && evento.time) return `${evento.date}T${evento.time}`
+  return evento.date || null
+}
+
 const normalizarEventos = (info) =>
   normalizarLista(info).map((evento) => {
-    const inicio = evento.startAt || evento.start || evento.date
+    const inicio = obtenerInicio(evento)
     const parsed = inicio ? new Date(inicio) : null
     const fecha =
       parsed && !Number.isNaN(parsed.getTime())
@@ -72,6 +78,19 @@ const normalizarEventos = (info) =>
       status: evento.status || 'programado',
     }
   })
+
+const obtenerHoraEvento = (evento) => {
+  const inicio = obtenerInicio(evento)
+  if (inicio) {
+    const parsed = new Date(inicio)
+    if (!Number.isNaN(parsed.getTime())) return parsed.getHours()
+  }
+  if (typeof evento.time === 'string') {
+    const match = evento.time.match(/\d{1,2}/)
+    if (match) return Number(match[0])
+  }
+  return null
+}
 
 const armarMapa = (items) => {
   return items.reduce((acc, evento) => {
@@ -210,9 +229,7 @@ function CalendarView() {
             {diasSemana.map((dia) => {
               const clave = aClave(dia)
               const eventosDia = mapaEventos[clave] ?? []
-              const eventosHora = eventosDia.filter(
-                (evento) => Number((evento.time || '0').split(':')[0]) === hora,
-              )
+              const eventosHora = eventosDia.filter((evento) => obtenerHoraEvento(evento) === hora)
               return (
                 <div key={`${clave}-${hora}`} className="schedule-cell">
                   {eventosHora.map((evento, index) => {
@@ -275,9 +292,7 @@ function CalendarView() {
           {cargando && <p className="day-empty">Cargando eventos...</p>}
           {!cargando &&
             horas.map((hora) => {
-              const eventosHora = eventosDia.filter(
-                (evento) => Number((evento.time || '0').split(':')[0]) === hora,
-              )
+              const eventosHora = eventosDia.filter((evento) => obtenerHoraEvento(evento) === hora)
               return (
                 <div key={hora} className="day-row">
                   <div className="day-time">{rellenar(hora)}:00</div>
